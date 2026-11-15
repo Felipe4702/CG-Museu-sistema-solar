@@ -43,17 +43,10 @@ CG-Museu-sistema-solar/
 
 ## Como compilar e executar
 
-O projeto foi preparado para **Windows**, usando o terminal **PowerShell integrado ao VS Code**, com GCC e FreeGLUT instalados no ambiente **MSYS2 UCRT64**.
-
-> **Importante:** desative o ambiente Conda antes de compilar, pois sua ativacao pode interferir no GCC e nas bibliotecas do MSYS2.
+O projeto foi preparado para **Windows**, usando o terminal **PowerShell integrado ao VS Code**, com GCC e FreeGLUT
 
 No terminal, dentro da pasta do repositorio:
 
-```powershell
-conda deactivate
-```
-
-Se o Conda não estiver ativo, esse passo não é necessário.
 
 Compile os arquivos:
 
@@ -93,7 +86,3 @@ O arquivo `museu.exe` é gerado localmente e não é enviado ao GitHub, conforme
 - Exibir informações sobre um planeta quando o visitante se aproximar e interagir.
 - Adicionar texturas e aprimorar a aparência do Sol, dos planetas e da Lua.
 - Aperfeiçoar a iluminação e o acabamento da exposição.
-
-## Observações
-
-Este projeto utiliza como ponto de partida os arquivos e os conceitos apresentados nas aulas de Computação Gráfica. A implementação prioriza comandos básicos do OpenGL, organização simples e código comentado.
