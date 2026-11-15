@@ -36,6 +36,34 @@ void idle()
     glutPostRedisplay();
 }
 
+// ------------------------------------------------------------
+// INTERACAO INICIAL PELO TECLADO
+// ------------------------------------------------------------
+
+void teclado(unsigned char tecla, int x, int y)
+{
+    // x e y sao as coordenadas do mouse recebidas pelo GLUT.
+    // Elas nao sao utilizadas por enquanto.
+    switch (tecla)
+    {
+        case 'p':
+        case 'P':
+            usaPerspectiva();
+            break;
+
+        case 'o':
+        case 'O':
+            usaOrtografica();
+            break;
+
+        case ' ':
+            alternaAnimacao();
+            break;
+    }
+
+    glutPostRedisplay();
+}
+
 void inicializa()
 {
     glClearColor(0.08f, 0.08f, 0.10f, 1.0f);
@@ -63,6 +91,7 @@ int main(int argc, char** argv)
     glutDisplayFunc(desenho);
     glutReshapeFunc(reshape);   
     glutIdleFunc(idle);
+    glutKeyboardFunc(teclado);
 
     glutMainLoop();
 
