@@ -1,0 +1,58 @@
+MUSEU DO SISTEMA SOLAR - VERSAO COM CAMERA DE VISITANTE
+
+Arquivos: main.c, camera.c, camera.h, scene.c, scene.h
+Bibliotecas: OpenGL classico + FreeGLUT (Windows/MSYS2 UCRT64)
+
+Compilar no terminal PowerShell do VS Code (Conda desativado):
+  gcc main.c camera.c scene.c -o museu.exe -lfreeglut -lopengl32 -lglu32 -lm
+
+Executar:
+  .\museu.exe
+
+CONTROLES
+  W / S   - caminhar para frente / para tras
+  A / D   - caminhar para a esquerda / direita
+  Mouse   - orientar a camera (olhar ao redor)
+  ESC     - soltar o mouse para usar o Windows
+  Clique esquerdo - capturar o mouse novamente
+  V       - alternar entre caminhada e voo
+  Q / Z   - subir / descer (somente no voo)
+  P / O   - projecao perspectiva / ortografica
+  Espaco  - pausar / retomar a rotacao dos planetas
+  R       - voltar a posicao e orientacao iniciais (tambem sai do voo)
+  Setas   - alternativa para olhar ao redor
+
+RESERVADO PARA PROXIMAS ETAPAS
+  F       - Flat Shading
+  G       - Smooth Shading
+  L       - iluminacao
+  E       - informacoes do planeta
+
+DISTRIBUICAO NA EXPOSICAO
+  Sol      X =   0.0
+  Mercurio X =  +6.8 (direita)
+  Venus    X = -12.0 (esquerda)
+  Terra    X = +17.2 (direita)
+  Lua      X = +20.4 (depois da Terra)
+  Marte    X = -22.4 (esquerda)
+  Jupiter  X = +27.6 (direita)
+  Saturno  X = -32.8 (esquerda)
+  Urano    X = +38.0 (direita)
+  Netuno   X = -43.2 (esquerda)
+
+Todos os astros estao com centro em Y = 4.5 e Z = 0.
+O Sol tem raio 3.2, os planetas 1.6 e a Lua 0.8.
+A sala tem 100 x 100 unidades e paredes com 14 unidades de altura.
+
+LOGICA DO ESPACAMENTO
+  X = 2.0: espaco livre entre superficies de planetas em orbitas adjacentes.
+  Diametro do planeta = 3.2.
+  Y = X + diametro + X = 7.2.
+  Raio da orbita n = 3.2 + 1.6 + X + (n - 1) * (3.2 + X).
+  As trajetorias futuras dos 8 planetas nao se sobrepoem.
+  A Lua e tratada separadamente.
+
+OBSERVACAO
+  Ainda nao ha translacao orbital, textura nem colisao do visitante
+  com as esferas. A camera e limitada pelas paredes e pela altura
+  do ambiente.

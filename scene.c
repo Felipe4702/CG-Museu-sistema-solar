@@ -1,5 +1,37 @@
 #include <GL/glut.h>
 #include "scene.h"
+#include <GL/glut.h>
+#include "scene.h"
+#include "camera.h"
+
+// ------------------------------------------------------------
+// TAMANHOS E DIMENSOES DO MUSEU
+// ------------------------------------------------------------
+
+// O Sol e o dobro do tamanho que tinha na etapa anterior.
+// Todos os planetas continuam com o mesmo raio, e a Lua e menor.
+#define RAIO_SOL 6.4f
+#define RAIO_PLANETA 1.6f
+#define RAIO_LUA 0.8f
+
+// Planetas e Lua permanecem na altura da visao do visitante.
+#define ALTURA_ASTROS 4.5f
+
+// O Sol fica um pouco mais alto para nao atravessar o piso.
+// Seu raio e 6.4 e seu centro esta em 6.5: sobra 0.1 ate o piso.
+#define ALTURA_SOL 6.5f
+
+// Folga entre a superficie do Sol e a superficie de Mercurio.
+// Ela e maior para deixar o Sol em destaque no centro da sala.
+#define ESPACO_INICIAL 8.0f
+
+// Folga entre as orbitas de planetas consecutivos.
+// Esta distancia continua igual a da etapa anterior.
+#define ESPACO_BASE 2.0f
+
+// Sala ampliada para a futura orbita de Netuno caber por inteiro.
+#define METADE_SALA 65.0f
+#define ALTURA_PAREDES 18.0f
 
 // ------------------------------------------------------------
 // ESTADO DA CENA
@@ -13,7 +45,7 @@ static int animacaoLigada = 1;
 static float anguloAnimacao = 0.0f;
 
 // ------------------------------------------------------------
-// ILUMINACAO BASICA (APROVEITADA DO CODIGO DO PROFESSOR)
+// ILUMINACAO BASICA
 // ------------------------------------------------------------
 
 void configuraIluminacao()
@@ -24,7 +56,7 @@ void configuraIluminacao()
     GLfloat ambiente[]  = {0.20f, 0.20f, 0.20f, 1.0f};
     GLfloat difusa[]    = {0.80f, 0.80f, 0.80f, 1.0f};
     GLfloat especular[] = {1.00f, 1.00f, 1.00f, 1.0f};
-    GLfloat posicao[]   = {0.0f, 8.0f, 5.0f, 1.0f};
+    GLfloat posicao[]   = {0.0f, 11.0f, 5.0f, 1.0f};
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambiente);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, difusa);
@@ -50,9 +82,8 @@ void configuraLuzesDaCena()
 // AMBIENTE DO MUSEU
 // ------------------------------------------------------------
 
-// O museu tem um piso quadrado e tres paredes.
-// A frente fica aberta para facilitar a visualizacao inicial.
-// As paredes foram afastadas para acomodar todos os planetas.
+// O museu tem piso, quatro paredes e teto.
+// Todas as superficies utilizam as dimensoes definidas acima.
 
 void desenhaPiso()
 {
@@ -60,10 +91,10 @@ void desenhaPiso()
 
     glBegin(GL_QUADS);
         glNormal3f(0.0f, 1.0f, 0.0f);
-        glVertex3f(-22.0f, 0.0f, -22.0f);
-        glVertex3f( 22.0f, 0.0f, -22.0f);
-        glVertex3f( 22.0f, 0.0f,  22.0f);
-        glVertex3f(-22.0f, 0.0f,  22.0f);
+        glVertex3f(-METADE_SALA, 0.0f, -METADE_SALA);
+        glVertex3f( METADE_SALA, 0.0f, -METADE_SALA);
+        glVertex3f( METADE_SALA, 0.0f,  METADE_SALA);
+        glVertex3f(-METADE_SALA, 0.0f,  METADE_SALA);
     glEnd();
 }
 
@@ -73,10 +104,10 @@ void desenhaParedeFundo()
 
     glBegin(GL_QUADS);
         glNormal3f(0.0f, 0.0f, 1.0f);
-        glVertex3f(-22.0f, 0.0f, -22.0f);
-        glVertex3f( 22.0f, 0.0f, -22.0f);
-        glVertex3f( 22.0f, 12.0f, -22.0f);
-        glVertex3f(-22.0f, 12.0f, -22.0f);
+        glVertex3f(-METADE_SALA, 0.0f, -METADE_SALA);
+        glVertex3f( METADE_SALA, 0.0f, -METADE_SALA);
+        glVertex3f( METADE_SALA, ALTURA_PAREDES, -METADE_SALA);
+        glVertex3f(-METADE_SALA, ALTURA_PAREDES, -METADE_SALA);
     glEnd();
 }
 
@@ -86,10 +117,10 @@ void desenhaParedeEsquerda()
 
     glBegin(GL_QUADS);
         glNormal3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(-22.0f, 0.0f, -22.0f);
-        glVertex3f(-22.0f, 0.0f,  22.0f);
-        glVertex3f(-22.0f, 12.0f,  22.0f);
-        glVertex3f(-22.0f, 12.0f, -22.0f);
+        glVertex3f(-METADE_SALA, 0.0f, -METADE_SALA);
+        glVertex3f(-METADE_SALA, 0.0f,  METADE_SALA);
+        glVertex3f(-METADE_SALA, ALTURA_PAREDES,  METADE_SALA);
+        glVertex3f(-METADE_SALA, ALTURA_PAREDES, -METADE_SALA);
     glEnd();
 }
 
@@ -99,10 +130,39 @@ void desenhaParedeDireita()
 
     glBegin(GL_QUADS);
         glNormal3f(-1.0f, 0.0f, 0.0f);
-        glVertex3f(22.0f, 0.0f,  22.0f);
-        glVertex3f(22.0f, 0.0f, -22.0f);
-        glVertex3f(22.0f, 12.0f, -22.0f);
-        glVertex3f(22.0f, 12.0f,  22.0f);
+        glVertex3f(METADE_SALA, 0.0f,  METADE_SALA);
+        glVertex3f(METADE_SALA, 0.0f, -METADE_SALA);
+        glVertex3f(METADE_SALA, ALTURA_PAREDES, -METADE_SALA);
+        glVertex3f(METADE_SALA, ALTURA_PAREDES,  METADE_SALA);
+    glEnd();
+}
+
+
+// Fecha a frente do museu (lado positivo do eixo Z).
+void desenhaParedeFrente()
+{
+    glColor3f(0.15f, 0.18f, 0.25f);
+
+    glBegin(GL_QUADS);
+        glNormal3f(0.0f, 0.0f, -1.0f);
+        glVertex3f( METADE_SALA, 0.0f, METADE_SALA);
+        glVertex3f(-METADE_SALA, 0.0f, METADE_SALA);
+        glVertex3f(-METADE_SALA, ALTURA_PAREDES, METADE_SALA);
+        glVertex3f( METADE_SALA, ALTURA_PAREDES, METADE_SALA);
+    glEnd();
+}
+
+// Teto simples para o ambiente parecer uma sala de verdade.
+void desenhaTeto()
+{
+    glColor3f(0.17f, 0.19f, 0.25f);
+
+    glBegin(GL_QUADS);
+        glNormal3f(0.0f, -1.0f, 0.0f);
+        glVertex3f(-METADE_SALA, ALTURA_PAREDES,  METADE_SALA);
+        glVertex3f( METADE_SALA, ALTURA_PAREDES,  METADE_SALA);
+        glVertex3f( METADE_SALA, ALTURA_PAREDES, -METADE_SALA);
+        glVertex3f(-METADE_SALA, ALTURA_PAREDES, -METADE_SALA);
     glEnd();
 }
 
@@ -114,9 +174,10 @@ void desenhaSol()
 {
     glPushMatrix();
 
-        // Posiciona o Sol acima do centro do piso.
-        glTranslatef(0.0f, 2.7f, 0.0f);
-        glScalef(1.6f, 1.6f, 1.6f);
+        // O Sol permanece no centro da sala, mais alto para nao
+        // atravessar o piso depois de dobrar de tamanho.
+        glTranslatef(0.0f, ALTURA_SOL, 0.0f);
+        glScalef(RAIO_SOL, RAIO_SOL, RAIO_SOL);
 
         // Emissao deixa o Sol visivelmente iluminado.
         // A configuracao de iluminacao completa ficara para depois.
@@ -142,7 +203,7 @@ void desenhaPlaneta(float x, float z, float raio,
     glPushMatrix();
 
         // 1. Translada: coloca o planeta em sua posicao fixa.
-        glTranslatef(x, 2.7f, z);
+        glTranslatef(x, ALTURA_ASTROS, z);
 
         // 2. Rotaciona: gira o planeta sobre seu proprio eixo Y.
         // Nao ha translacao orbital nesta primeira entrega.
@@ -167,42 +228,68 @@ void desenhaPlaneta(float x, float z, float raio,
     glPopMatrix();
 }
 
+// Calcula a distancia entre o Sol e o centro de cada planeta.
+// ordem = 1 para Mercurio, 2 para Venus, ... 8 para Netuno.
+//
+// Mercurio: folga de ESPACO_INICIAL entre a borda do Sol
+// e a borda do planeta.
+// Cada nova orbita acrescenta o diametro de um planeta
+// mais ESPACO_BASE. A progressao anterior e preservada.
+static float raioOrbita(int ordem)
+{
+    float diametroPlaneta = 2.0f * RAIO_PLANETA;
+    float primeiraOrbita = RAIO_SOL + ESPACO_INICIAL + RAIO_PLANETA;
+
+    return primeiraOrbita + (ordem - 1) * (diametroPlaneta + ESPACO_BASE);
+}
+
 void desenhaObjetosDoMuseu()
 {
-    // Centro do Sistema Solar.
+    // Todos os astros estao no mesmo plano Z = 0.
+    // Planetas e Lua ficam em Y = ALTURA_ASTROS; o Sol, que e maior,
+    // tem o centro um pouco mais alto para nao atravessar o piso.
+    // O visitante ve impares a direita (+X) e pares a esquerda (-X).
+
     desenhaSol();
 
-    // Planetas em ordem crescente de distancia ao Sol.
-    // Os valores sao adaptados ao tamanho da sala.
-    // Nao representam distancias ou diametros astronomicos reais.
+    // 1. Mercurio: direita, primeira orbita (X = +16.0).
+    desenhaPlaneta( raioOrbita(1), 0.0f, RAIO_PLANETA,
+                    0.55f, 0.53f, 0.50f);
 
-    // Mercurio: distancia aproximada ao centro = 3.6 unidades.
-    desenhaPlaneta(  3.5f, -1.0f, 0.27f, 0.55f, 0.53f, 0.50f);
+    // 2. Venus: esquerda, segunda orbita (X = -21.2).
+    desenhaPlaneta(-raioOrbita(2), 0.0f, RAIO_PLANETA,
+                    0.86f, 0.72f, 0.43f);
 
-    // Venus: distancia aproximada ao centro = 5.8 unidades.
-    desenhaPlaneta(  5.0f,  3.0f, 0.45f, 0.86f, 0.72f, 0.43f);
+    // 3. Terra: direita, terceira orbita (X = +26.4).
+    desenhaPlaneta( raioOrbita(3), 0.0f, RAIO_PLANETA,
+                    0.15f, 0.39f, 0.90f);
 
-    // Terra: distancia aproximada ao centro = 7.6 unidades.
-    desenhaPlaneta(  1.0f,  7.5f, 0.51f, 0.15f, 0.39f, 0.90f);
+    // Lua: logo depois da Terra, na mesma altura.
+    // Distancia entre centros = raio da Terra + raio da Lua + 0.8.
+    // Seu movimento orbital em torno da Terra sera feito no futuro.
+    desenhaPlaneta( raioOrbita(3) + RAIO_PLANETA + RAIO_LUA + 0.8f,
+                    0.0f, RAIO_LUA, 0.66f, 0.66f, 0.66f);
 
-    // Lua: fica proxima da Terra, mas nao orbita nesta etapa.
-    desenhaPlaneta(  2.2f,  7.7f, 0.17f, 0.66f, 0.66f, 0.66f);
+    // 4. Marte: esquerda, quarta orbita (X = -31.6).
+    desenhaPlaneta(-raioOrbita(4), 0.0f, RAIO_PLANETA,
+                    0.80f, 0.30f, 0.18f);
 
-    // Marte: distancia aproximada ao centro = 8.8 unidades.
-    desenhaPlaneta( -7.2f,  5.0f, 0.36f, 0.80f, 0.30f, 0.18f);
+    // 5. Jupiter: direita, quinta orbita (X = +36.8).
+    desenhaPlaneta( raioOrbita(5), 0.0f, RAIO_PLANETA,
+                    0.83f, 0.61f, 0.42f);
 
-    // Jupiter: distancia aproximada ao centro = 11.0 unidades.
-    desenhaPlaneta(-11.0f, -1.0f, 1.12f, 0.83f, 0.61f, 0.42f);
+    // 6. Saturno: esquerda, sexta orbita (X = -42.0).
+    // Aneis de Saturno serao acrescentados futuramente.
+    desenhaPlaneta(-raioOrbita(6), 0.0f, RAIO_PLANETA,
+                    0.85f, 0.75f, 0.48f);
 
-    // Saturno: distancia aproximada ao centro = 13.0 unidades.
-    // Os aneis poderao ser adicionados em outra etapa.
-    desenhaPlaneta( -7.0f,-11.0f, 0.95f, 0.85f, 0.75f, 0.48f);
+    // 7. Urano: direita, setima orbita (X = +47.2).
+    desenhaPlaneta( raioOrbita(7), 0.0f, RAIO_PLANETA,
+                    0.47f, 0.82f, 0.85f);
 
-    // Urano: distancia aproximada ao centro = 15.3 unidades.
-    desenhaPlaneta(  8.0f,-13.0f, 0.69f, 0.47f, 0.82f, 0.85f);
-
-    // Netuno: distancia aproximada ao centro = 17.1 unidades.
-    desenhaPlaneta( 17.0f,  2.0f, 0.68f, 0.19f, 0.31f, 0.77f);
+    // 8. Netuno: esquerda, oitava orbita (X = -52.4).
+    desenhaPlaneta(-raioOrbita(8), 0.0f, RAIO_PLANETA,
+                    0.19f, 0.31f, 0.77f);
 }
 
 // ------------------------------------------------------------
@@ -223,11 +310,40 @@ void desenhaCena()
         glDisable(GL_LIGHTING);
     }
 
-    desenhaPiso();
-    desenhaParedeFundo();
-    desenhaParedeEsquerda();
-    desenhaParedeDireita();
+    // Define como o ambiente sera desenhado
+    // dependendo da projecao selecionada.
+    if (cameraEstaEmPerspectiva())
+    {
+        // Modo perspectiva: museu completo.
+        desenhaPiso();
+        desenhaParedeFundo();
+        desenhaParedeEsquerda();
+        desenhaParedeDireita();
+        desenhaParedeFrente();
+        desenhaTeto();
+    }
+    else
+    {
+        // Modo ortografico: afastamos o piso
+        // para a altura Y = -50.
+        glPushMatrix();
+            glTranslatef(0.0f, -50.0f, 0.0f);
+            desenhaPiso();
+        glPopMatrix();
 
+        // Afastamos o teto para a altura Y = 50.
+        // Subtraimos a altura original do teto,
+        // pois ele ja foi criado em Y = 18.
+        glPushMatrix();
+            glTranslatef(0.0f, 50.0f - ALTURA_PAREDES, 0.0f);
+            desenhaTeto();
+        glPopMatrix();
+
+        // As quatro paredes nao sao desenhadas
+        // enquanto a projecao ortografica estiver ativa.
+    }
+
+    // Os astros aparecem normalmente nas duas projecoes.
     desenhaObjetosDoMuseu();
 }
 

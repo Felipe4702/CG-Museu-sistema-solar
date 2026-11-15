@@ -1,0 +1,31 @@
+# Executaveis gerados pela compilacao
+*.exe
+*.out
+*.dll
+*.stackdump
+
+# Arquivo executavel de exemplo fornecido com o projeto-base
+/teste
+
+# Arquivos intermediarios de compilacao
+*.o
+*.obj
+*.a
+*.pdb
+
+# Pastas de compilacao
+/build/
+/build_*/
+/dist/
+
+# Configuracoes locais do editor
+.vscode/
+.vs/
+
+# Arquivos temporarios do sistema
+.DS_Store
+Thumbs.db
+
+# Arquivos temporarios de testes e diagnosticos
+teste_gcc.c
+erro_compilacao.txt
