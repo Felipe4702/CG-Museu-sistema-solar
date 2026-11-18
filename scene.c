@@ -8,8 +8,8 @@
 // TAMANHOS E DIMENSOES DO MUSEU
 // ------------------------------------------------------------
 
-// O Sol e o dobro do tamanho que tinha na etapa anterior.
-// Todos os planetas continuam com o mesmo raio, e a Lua e menor.
+// O Sol e 4X.
+// Todos os planetas x, e a Lua x/2.
 #define RAIO_SOL 6.4f
 #define RAIO_PLANETA 1.6f
 #define RAIO_LUA 0.8f
@@ -26,7 +26,7 @@
 #define ESPACO_INICIAL 8.0f
 
 // Folga entre as orbitas de planetas consecutivos.
-// Esta distancia continua igual a da etapa anterior.
+// distancia de um planeta a ourto é 4 + tamnaho planeta.
 #define ESPACO_BASE 2.0f
 
 // Sala ampliada para a futura orbita de Netuno caber por inteiro.
@@ -48,6 +48,7 @@ static float anguloAnimacao = 0.0f;
 // ILUMINACAO BASICA
 // ------------------------------------------------------------
 
+// original
 void configuraIluminacao()
 {
     glEnable(GL_LIGHTING);
@@ -64,6 +65,8 @@ void configuraIluminacao()
     glLightfv(GL_LIGHT0, GL_POSITION, posicao);
 }
 
+
+//originakl
 void configuraMaterialExemplo()
 {
     GLfloat especular[] = {0.8f, 0.8f, 0.8f, 1.0f};
@@ -72,10 +75,10 @@ void configuraMaterialExemplo()
     glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 60.0f);
 }
 
-// Essa funcao sera completada no encontro sobre iluminacao.
+// Essa funcao sera completada deoiis.
 void configuraLuzesDaCena()
 {
-    // Por enquanto, usamos apenas a luz original do professor.
+    
 }
 
 // ------------------------------------------------------------
@@ -84,7 +87,7 @@ void configuraLuzesDaCena()
 
 // O museu tem piso, quatro paredes e teto.
 // Todas as superficies utilizam as dimensoes definidas acima.
-
+//original
 void desenhaPiso()
 {
     glColor3f(0.30f, 0.30f, 0.35f);
@@ -174,8 +177,6 @@ void desenhaSol()
 {
     glPushMatrix();
 
-        // O Sol permanece no centro da sala, mais alto para nao
-        // atravessar o piso depois de dobrar de tamanho.
         glTranslatef(0.0f, ALTURA_SOL, 0.0f);
         glScalef(RAIO_SOL, RAIO_SOL, RAIO_SOL);
 
@@ -247,7 +248,6 @@ void desenhaObjetosDoMuseu()
 {
     // Todos os astros estao no mesmo plano Z = 0.
     // Planetas e Lua ficam em Y = ALTURA_ASTROS; o Sol, que e maior,
-    // tem o centro um pouco mais alto para nao atravessar o piso.
     // O visitante ve impares a direita (+X) e pares a esquerda (-X).
 
     desenhaSol();

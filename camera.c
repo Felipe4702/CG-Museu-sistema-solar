@@ -13,7 +13,7 @@
 // A camera fica nessa mesma altura enquanto caminhamos.
 #define ALTURA_VISITANTE 4.5f
 
-// Distancia percorrida por segundo (independente dos FPS).
+// Distancia percorrida por segundo
 #define VELOCIDADE 8.0f
 
 // A sala vai de -65 ate +65 nos eixos X e Z.
@@ -66,7 +66,7 @@ void inicializaCamera(void)
 // ------------------------------------------------------------
 // POSICAO E DIRECAO DO OLHAR
 // ------------------------------------------------------------
-
+//ia
 void aplicaCamera(void)
 {
     float horizontal = anguloHorizontal * PI / 180.0f;
@@ -144,13 +144,14 @@ void usaOrtografica()
 
     // Olhando para o centro da sala.
     anguloHorizontal = -90.0f;
-    anguloVertical = -6.0f;
+    anguloVertical = 0.0f;
 }
 
 // ------------------------------------------------------------
 // MOVIMENTACAO CONTINUA DO VISITANTE
 // ------------------------------------------------------------
 
+// IA
 void atualizaMovimentoCamera(float frente, float lado,
                             float vertical, float deltaTempo)
 {

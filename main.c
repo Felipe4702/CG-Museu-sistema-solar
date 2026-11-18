@@ -161,7 +161,7 @@ void tecladoSolto(unsigned char tecla, int x, int y)
 // ------------------------------------------------------------
 // MOUSE: CONTROLA PARA ONDE O VISITANTE OLHA
 // ------------------------------------------------------------
-
+//ia
 void movimentoMouse(int x, int y)
 {
     if (!mouseCapturado)
@@ -251,7 +251,7 @@ int main(int argc, char **argv)
 
     // Registro das funcoes de entrada de teclado e mouse.
     glutKeyboardFunc(teclado);
-    glutKeyboardUpFunc(tecladoSolto); // Disponivel no FreeGLUT.
+    glutKeyboardUpFunc(tecladoSolto);
     glutSpecialFunc(teclasEspeciais);
     glutPassiveMotionFunc(movimentoMouse);
     glutMotionFunc(movimentoMouse);
@@ -260,7 +260,6 @@ int main(int argc, char **argv)
     // Evita que o Windows repita pressionamentos de teclas mantidas.
     glutIgnoreKeyRepeat(1);
 
-    // Esconde e centraliza o cursor para olhar como em um jogo 3D.
     glutSetCursor(GLUT_CURSOR_NONE);
     glutWarpPointer(largura / 2, altura / 2);
 

@@ -4,9 +4,6 @@
 *.dll
 *.stackdump
 
-# Arquivo executavel de exemplo fornecido com o projeto-base
-/teste
-
 # Arquivos intermediarios de compilacao
 *.o
 *.obj
