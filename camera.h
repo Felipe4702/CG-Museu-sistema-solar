@@ -1,26 +1,31 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-// Posicao e orientacao iniciais da camera.
+// IA (camera): reinicia a posicao e a orientacao do visitante.
 void inicializaCamera(void);
 
-// Define o ponto de vista por meio de gluLookAt().
+// IA (camera): aplica posicao e direcao na matriz de visualizacao.
 void aplicaCamera(void);
 
-// Configura a projecao e permite alternar entre os dois modos.
+// IA (camera): escolhe perspectiva, ortografica ou visao de cima.
 void configuraProjecao(int largura, int altura);
 void usaPerspectiva(void);
 void usaOrtografica(void);
 
-// Atualiza o deslocamento a partir das teclas que estao pressionadas.
+// IA (camera): I alterna a vista superior sem perder a vista anterior.
+void alternaVistaSuperior(void);
+int cameraEstaEmVistaSuperior(void);
+void obtemPosicaoCamera(float *x, float *y, float *z);
+
+// IA (movimentacao): caminha/voa conforme as teclas pressionadas.
 // deltaTempo e medido em segundos.
 void atualizaMovimentoCamera(float frente, float lado,
                             float vertical, float deltaTempo);
 
-// V alterna entre caminhada no piso e voo livre na vertical.
+// IA (movimentacao): V alterna caminhada e voo vertical.
 void alternaModoVoo(void);
 
-// Altera os angulos horizontal e vertical do olhar.
+// IA (camera): altera os angulos horizontal e vertical do olhar.
 void giraCamera(float horizontal, float vertical);
 
 // Informa se a camera esta usando a projecao perspectiva.

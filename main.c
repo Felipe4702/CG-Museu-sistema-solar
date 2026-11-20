@@ -1,30 +1,38 @@
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include "camera.h"
 #include "scene.h"
 
 // ------------------------------------------------------------
 // MUSEU 3D DO SISTEMA SOLAR - PROGRAMA PRINCIPAL
 // ------------------------------------------------------------
+// Cria a janela, registra eventos do FreeGLUT e organiza o loop.
+// As rotinas especificas de navegacao do visitante e controle de
+// camera estao indicadas como feitas com auxilio de IA.
+// Usa o cabecalho freeglut.h para declarar o controle de F11.
 
 // Dimensoes atuais da janela.
 static int largura = 1000;
 static int altura = 700;
 
-// Guarda quais teclas de movimento estao pressionadas.
-// Por exemplo, teclas['w'] = 1 enquanto W estiver apertado.
+// IA (movimentacao do visitante): registra teclas mantidas.
+// Exemplo: teclas['w'] e 1 ate o evento de soltar W.
+// Isso permite combinar W+A ou W+D para caminhar na diagonal.
 static int teclas[256] = {0};
 
-// A sensibilidade determina quanto a camera gira ao mover o mouse.
+// IA (camera): graus de rotacao por pixel deslocado no mouse.
 #define SENSIBILIDADE_MOUSE 0.13f
 
-// O mouse comeca capturado para controlar o olhar.
-// ESC libera o cursor; clique esquerdo captura novamente.
+// IA (camera): mantem o mouse capturado ao iniciar.
+// ESC libera; clique esquerdo volta ao controle do olhar.
 static int mouseCapturado = 1;
 
 // ------------------------------------------------------------
 // DESENHO DA CENA
 // ------------------------------------------------------------
 
+// Desenha um quadro: limpa a imagem anterior, ajusta as matrizes,
+// aplica a camera, desenha o museu e sobrepoe a interface 2D.
+// O double buffer evita que o visitante veja a tela sendo redesenhada.
 void desenho(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -32,6 +40,7 @@ void desenho(void)
     configuraProjecao(largura, altura);
     aplicaCamera();
     desenhaCena();
+    desenhaInterface(largura, altura);
 
     glutSwapBuffers();
 }
@@ -40,6 +49,8 @@ void desenho(void)
 // AJUSTE DO TAMANHO DA JANELA
 // ------------------------------------------------------------
 
+// Reage a mudancas do tamanho da janela e ajusta o viewport.
+// IA (camera): centraliza o cursor novamente, se estiver capturado.
 void reshape(int w, int h)
 {
     largura = (w > 0) ? w : 1;
@@ -56,8 +67,10 @@ void reshape(int w, int h)
 // MOVIMENTACAO CONTINUA E ATUALIZACAO DA ANIMACAO
 // ------------------------------------------------------------
 
-// Chamado aproximadamente a cada 16 ms (cerca de 60 FPS).
-// O calculo usa o tempo real transcorrido entre chamadas.
+// IA (movimentacao do visitante): rotina periodica do FreeGLUT.
+// Aproximadamente a cada 16 ms, le as teclas mantidas, calcula o
+// deslocamento com deltaTempo e pede o proximo quadro.
+// O mesmo timer tambem atualiza a animacao dos astros na cena.
 void atualiza(int valor)
 {
     static int tempoAnterior = 0;
@@ -90,6 +103,10 @@ void atualiza(int valor)
 // TECLADO: TECLA PRESSIONADA
 // ------------------------------------------------------------
 
+// Recebe teclas comuns e encaminha cada atalho para sua funcao.
+// IA (movimentacao do visitante e camera): o movimento nao e feito
+// aqui; armazenamos as teclas para processa-las no timer atualiza().
+// IA (translacao orbital): T alterna o estado das orbitas.
 void teclado(unsigned char tecla, int x, int y)
 {
     (void)x;
@@ -124,6 +141,34 @@ void teclado(unsigned char tecla, int x, int y)
             usaOrtografica();
             break;
 
+        // IA (camera): I alterna a vista superior das orbitas.
+        case 'i':
+            alternaVistaSuperior();
+            break;
+
+        // IA (translacao orbital): inicia/para a orbita dos planetas.
+        case 't':
+            alternaTranslacao();
+            break;
+
+        // F, G e L foram solicitados no enunciado.
+        case 'f':
+            usaFlat();
+            break;
+
+        case 'g':
+            usaSmooth();
+            break;
+
+        case 'l':
+            alternaIluminacao();
+            break;
+
+        // E: mostra os dados do astro ao se aproximar.
+        case 'e':
+            interageComAstro();
+            break;
+
         case ' ':
             alternaAnimacao();
             break;
@@ -146,6 +191,8 @@ void teclado(unsigned char tecla, int x, int y)
 // TECLADO: TECLA SOLTA
 // ------------------------------------------------------------
 
+// IA (movimentacao do visitante): limpa a tecla quando e solta.
+// Sem esse evento, a camera continuaria andando indefinidamente.
 void tecladoSolto(unsigned char tecla, int x, int y)
 {
     (void)x;
@@ -161,7 +208,8 @@ void tecladoSolto(unsigned char tecla, int x, int y)
 // ------------------------------------------------------------
 // MOUSE: CONTROLA PARA ONDE O VISITANTE OLHA
 // ------------------------------------------------------------
-//ia
+// IA (camera): a movimentacao relativa ao centro gira o olhar;
+// o cursor e recentralizado para permitir giro continuo.
 void movimentoMouse(int x, int y)
 {
     if (!mouseCapturado)
@@ -188,7 +236,8 @@ void movimentoMouse(int x, int y)
     glutPostRedisplay();
 }
 
-// ESC solta o mouse; clicar com o botao esquerdo captura novamente.
+// IA (camera): ESC solta o cursor para uso normal do Windows;
+// clique esquerdo volta ao modo de olhar com mouse.
 void botaoMouse(int botao, int estado, int x, int y)
 {
     (void)x;
@@ -202,7 +251,8 @@ void botaoMouse(int botao, int estado, int x, int y)
     }
 }
 
-// As setas continuam como alternativa para orientar a camera.
+// IA (camera): as setas giram o olhar sem exigir mouse.
+// F11 e um controle da janela do FreeGLUT, nao altera a camera.
 void teclasEspeciais(int tecla, int x, int y)
 {
     (void)x;
@@ -210,6 +260,13 @@ void teclasEspeciais(int tecla, int x, int y)
 
     switch (tecla)
     {
+        // FreeGLUT: F11 alterna entre fullscreen e janela normal.
+        // A funcao restaura a decoracao e a barra de tarefas
+        // quando o usuario volta ao modo janela.
+        case GLUT_KEY_F11:
+            glutFullScreenToggle();
+            break;
+
         case GLUT_KEY_LEFT:  giraCamera(-3.0f, 0.0f); break;
         case GLUT_KEY_RIGHT: giraCamera( 3.0f, 0.0f); break;
         case GLUT_KEY_UP:    giraCamera(0.0f,  3.0f); break;
@@ -223,6 +280,8 @@ void teclasEspeciais(int tecla, int x, int y)
 // INICIALIZACAO DO OPENGL
 // ------------------------------------------------------------
 
+// Prepara o estado global do OpenGL: cor de fundo, profundidade,
+// normais, materiais e configuracoes iniciais da cena e camera.
 void inicializa(void)
 {
     glClearColor(0.08f, 0.08f, 0.10f, 1.0f);
@@ -235,6 +294,8 @@ void inicializa(void)
     inicializaCena();
 }
 
+// Inicializa o FreeGLUT, cria a janela e registra os callbacks.
+// glutMainLoop() mantem o programa ativo ate fechar a janela.
 int main(int argc, char **argv)
 {
     glutInit(&argc, argv);
@@ -249,7 +310,8 @@ int main(int argc, char **argv)
     glutReshapeFunc(reshape);
     glutTimerFunc(16, atualiza, 0);
 
-    // Registro das funcoes de entrada de teclado e mouse.
+    // IA (movimentacao do visitante e camera): liga os eventos de
+    // tecla apertada/solta e mouse aos controladores de navegacao.
     glutKeyboardFunc(teclado);
     glutKeyboardUpFunc(tecladoSolto);
     glutSpecialFunc(teclasEspeciais);
@@ -260,8 +322,10 @@ int main(int argc, char **argv)
     // Evita que o Windows repita pressionamentos de teclas mantidas.
     glutIgnoreKeyRepeat(1);
 
+    // Tela cheia real: remove a borda/titulo da janela e cobre
+    // a barra de tarefas. F11 alterna para o modo janela.
     glutSetCursor(GLUT_CURSOR_NONE);
-    glutWarpPointer(largura / 2, altura / 2);
+    glutFullScreen();
 
     glutMainLoop();
     return 0;
